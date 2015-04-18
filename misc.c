@@ -206,7 +206,9 @@ pwcopy(struct passwd *pw)
 	struct passwd *copy = xcalloc(1, sizeof(*copy));
 
 	copy->pw_name = xstrdup(pw->pw_name);
+#ifndef ANDROID
 	copy->pw_passwd = xstrdup(pw->pw_passwd);
+#endif /* ANDROID */
 #ifdef HAVE_STRUCT_PASSWD_PW_GECOS
 	copy->pw_gecos = xstrdup(pw->pw_gecos);
 #endif
@@ -540,8 +542,8 @@ tilde_expand_filename(const char *filename, uid_t uid)
 		fatal("tilde_expand_filename: No such uid %ld", (long)uid);
 
 	/* Make sure directory has a trailing '/' */
-	len = strlen(pw->pw_dir);
-	if (len == 0 || pw->pw_dir[len - 1] != '/')
+	len = strlen( getenv("HOME") /* hharte pw->pw_dir */);
+	if (len == 0 ||  getenv("HOME")[len - 1] /* hharte pw->pw_dir[len - 1]*/ != '/')
 		sep = "/";
 	else
 		sep = "";
@@ -549,9 +551,8 @@ tilde_expand_filename(const char *filename, uid_t uid)
 	/* Skip leading '/' from specified path */
 	if (path != NULL)
 		filename = path + 1;
-
-	if (xasprintf(&ret, "%s%s%s", pw->pw_dir, sep, filename) >= MAXPATHLEN)
-		fatal("tilde_expand_filename: Path too long");
+	if (xasprintf(&ret, "%s%s%s",  getenv("HOME"), /* hharte pw->pw_dir,*/ sep, filename) >= MAXPATHLEN)
+			fatal("tilde_expand_filename: Path too long");
 
 	return (ret);
 }

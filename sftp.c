@@ -2228,7 +2228,9 @@ main(int argc, char **argv)
 
 	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
 	sanitise_stdfd();
+#ifndef ANDROID
 	setlocale(LC_CTYPE, "");
+#endif // hharte
 
 	__progname = ssh_get_progname(argv[0]);
 	memset(&args, '\0', sizeof(args));

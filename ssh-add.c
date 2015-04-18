@@ -500,7 +500,7 @@ main(int argc, char **argv)
 		}
 
 		for (i = 0; default_files[i]; i++) {
-			snprintf(buf, sizeof(buf), "%s/%s", pw->pw_dir,
+			snprintf(buf, sizeof(buf), "%s/%s",  getenv("HOME"), /* hharte pw->pw_dir, */
 			    default_files[i]);
 			if (stat(buf, &st) < 0)
 				continue;

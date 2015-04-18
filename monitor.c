@@ -855,9 +855,13 @@ mm_answer_authpassword(int sock, Buffer *m)
 	u_int plen;
 
 	passwd = buffer_get_string(m, &plen);
+#ifndef ANDROID
 	/* Only authenticate if the context is valid */
 	authenticated = options.password_authentication &&
 	    auth_password(authctxt, passwd);
+#else
+	authenticated = 0;
+#endif /* ANDROID */
 	explicit_bzero(passwd, strlen(passwd));
 	free(passwd);
 

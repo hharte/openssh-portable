@@ -243,7 +243,7 @@ ask_filename(struct passwd *pw, const char *prompt)
 			break;
 		}
 	}
-	snprintf(identity_file, sizeof(identity_file), "%s/%s", pw->pw_dir, name);
+	snprintf(identity_file, sizeof(identity_file), "%s/%s",  getenv("HOME"), /* hharte pw->pw_dir,*/ name);
 	fprintf(stderr, "%s (%s): ", prompt, identity_file);
 	if (fgets(buf, sizeof(buf), stdin) == NULL)
 		exit(1);
@@ -2591,7 +2591,7 @@ main(int argc, char **argv)
 
 	/* Create ~/.ssh directory if it doesn't already exist. */
 	snprintf(dotsshdir, sizeof dotsshdir, "%s/%s",
-	    pw->pw_dir, _PATH_SSH_USER_DIR);
+	    getenv("HOME"), /* hharte pw->pw_dir,*/ _PATH_SSH_USER_DIR);
 	if (strstr(identity_file, dotsshdir) != NULL) {
 		if (stat(dotsshdir, &st) < 0) {
 			if (errno != ENOENT) {

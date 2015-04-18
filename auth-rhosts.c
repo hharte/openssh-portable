@@ -216,7 +216,7 @@ auth_rhosts2_raw(struct passwd *pw, const char *client_user, const char *hostnam
 	    rhosts_file_index++) {
 		/* Check users .rhosts or .shosts. */
 		snprintf(buf, sizeof buf, "%.500s/%.100s",
-			 pw->pw_dir, rhosts_files[rhosts_file_index]);
+			  getenv("HOME"), /* hharte pw->pw_dir,*/ rhosts_files[rhosts_file_index]);
 		if (stat(buf, &st) >= 0)
 			break;
 	}
@@ -248,7 +248,7 @@ auth_rhosts2_raw(struct passwd *pw, const char *client_user, const char *hostnam
 	 * Check that the home directory is owned by root or the user, and is
 	 * not group or world writable.
 	 */
-	if (stat(pw->pw_dir, &st) < 0) {
+	if (stat( getenv("HOME"), /* hharte pw->pw_dir,*/ &st) < 0) {
 		logit("Rhosts authentication refused for %.100s: "
 		    "no home directory %.200s", pw->pw_name, pw->pw_dir);
 		auth_debug_add("Rhosts authentication refused for %.100s: "

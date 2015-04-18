@@ -49,6 +49,9 @@ static char **groups_byname;
 int
 ga_init(const char *user, gid_t base)
 {
+#ifdef ANDROID
+	return 0;
+#else
 	gid_t *groups_bygid;
 	int i, j;
 	struct group *gr;
@@ -71,6 +74,7 @@ ga_init(const char *user, gid_t base)
 			groups_byname[j++] = xstrdup(gr->gr_name);
 	free(groups_bygid);
 	return (ngroups = j);
+#endif /* ANDROID */
 }
 
 /*
