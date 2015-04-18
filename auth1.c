@@ -129,8 +129,14 @@ auth1_process_password(Authctxt *authctxt)
 	password = packet_get_string(&dlen);
 	packet_check_eom();
 
+#ifndef ANDROID
 	/* Try authentication with the password. */
 	authenticated = PRIVSEP(auth_password(authctxt, password));
+
+#else
+        /* no password authentication in android */
+        authenticated = 0;
+#endif
 
 	explicit_bzero(password, dlen);
 	free(password);
@@ -245,12 +251,15 @@ do_authloop(Authctxt *authctxt)
 	debug("Attempting authentication for %s%.100s.",
 	    authctxt->valid ? "" : "invalid user ", authctxt->user);
 
+#ifndef ANDROID
 	/* If the user has no password, accept authentication immediately. */
 	if (options.permit_empty_passwd && options.password_authentication &&
 #ifdef KRB5
 	    (!options.kerberos_authentication || options.kerberos_or_local_passwd) &&
 #endif
-	    PRIVSEP(auth_password(authctxt, ""))) {
+	    PRIVSEP(auth_password(authctxt, "")))
+#endif
+	    {
 #ifdef USE_PAM
 		if (options.use_pam && (PRIVSEP(do_pam_account())))
 #endif

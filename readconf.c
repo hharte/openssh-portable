@@ -575,7 +575,7 @@ match_cfg_line(Options *options, char **condition, struct passwd *pw,
 
 			cmd = percent_expand(arg,
 			    "L", shorthost,
-			    "d", pw->pw_dir,
+			    "d", getenv("HOME"),
 			    "h", host,
 			    "l", thishost,
 			    "n", original_host,

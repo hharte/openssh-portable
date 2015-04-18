@@ -385,7 +385,7 @@ struct winsize {
 # define	NFDBITS (8 * sizeof(unsigned long))
 #endif
 
-#if defined(HAVE_DECL_HOWMANY) && HAVE_DECL_HOWMANY == 0
+#if defined(ANDROID) || (defined(HAVE_DECL_HOWMANY) && HAVE_DECL_HOWMANY == 0)
 # define howmany(x,y)	(((x)+((y)-1))/(y))
 #endif
 

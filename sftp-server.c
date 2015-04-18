@@ -1558,7 +1558,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
 			break;
 		case 'd':
 			cp = tilde_expand_filename(optarg, user_pw->pw_uid);
-			homedir = percent_expand(cp, "d", user_pw->pw_dir,
+			homedir = percent_expand(cp, "d",  getenv("HOME"),
 			    "u", user_pw->pw_name, (char *)NULL);
 			free(cp);
 			break;

@@ -939,7 +939,7 @@ check_quietlogin(Session *s, const char *command)
 	/* Return 1 if .hushlogin exists or a command given. */
 	if (command != NULL)
 		return 1;
-	snprintf(buf, sizeof(buf), "%.200s/.hushlogin", pw->pw_dir);
+	snprintf(buf, sizeof(buf), "%.200s/.hushlogin",  getenv("HOME"));
 #ifdef HAVE_LOGIN_CAP
 	if (login_getcapbool(lc, "hushlogin", 0) || stat(buf, &st) >= 0)
 		return 1;
@@ -1182,7 +1182,7 @@ do_setup_env(Session *s, const char *shell)
 #ifdef _AIX
 		child_set_env(&env, &envsize, "LOGIN", pw->pw_name);
 #endif
-		child_set_env(&env, &envsize, "HOME", pw->pw_dir);
+		child_set_env(&env, &envsize, "HOME",  getenv("HOME"));
 #ifdef HAVE_LOGIN_CAP
 		if (setusercontext(lc, pw, pw->pw_uid, LOGIN_SETPATH) < 0)
 			child_set_env(&env, &envsize, "PATH", _PATH_STDPATH);
@@ -1313,7 +1313,7 @@ do_setup_env(Session *s, const char *shell)
 	/* read $HOME/.ssh/environment. */
 	if (options.permit_user_env && !options.use_login) {
 		snprintf(buf, sizeof buf, "%.200s/.ssh/environment",
-		    strcmp(pw->pw_dir, "/") ? pw->pw_dir : "");
+		    strcmp(getenv("HOME"), "/") ? pw->pw_dir : "");
 		read_environment_file(&env, &envsize, buf);
 	}
 	if (debug_flag) {
@@ -1515,7 +1515,10 @@ do_setusercontext(struct passwd *pw)
 			perror("initgroups");
 			exit(1);
 		}
+#ifndef ANDROID
+		/* FIXME: hharte: Android does not have this function. */
 		endgrent();
+#endif /* ANDROID */
 #endif
 
 		platform_setusercontext_post_groups(pw);
@@ -1524,7 +1527,7 @@ do_setusercontext(struct passwd *pw)
 		    strcasecmp(options.chroot_directory, "none") != 0) {
                         tmp = tilde_expand_filename(options.chroot_directory,
 			    pw->pw_uid);
-			chroot_path = percent_expand(tmp, "h", pw->pw_dir,
+			chroot_path = percent_expand(tmp, "h",  getenv("HOME"), 
 			    "u", pw->pw_name, (char *)NULL);
 			safely_chroot(chroot_path, pw->pw_uid);
 			free(tmp);
@@ -1775,17 +1778,17 @@ do_child(Session *s, const char *command)
 
 		k_setpag();
 
-		if (k_afs_cell_of_file(pw->pw_dir, cell, sizeof(cell)) == 0)
+		if (k_afs_cell_of_file( getenv("HOME"), cell, sizeof(cell)) == 0)
 			krb5_afslog(s->authctxt->krb5_ctx,
 			    s->authctxt->krb5_fwd_ccache, cell, NULL);
 
 		krb5_afslog_home(s->authctxt->krb5_ctx,
-		    s->authctxt->krb5_fwd_ccache, NULL, NULL, pw->pw_dir);
+		    s->authctxt->krb5_fwd_ccache, NULL, NULL, getenv("HOME"));
 	}
 #endif
 
 	/* Change current directory to the user's home directory. */
-	if (chdir(pw->pw_dir) < 0) {
+	if (chdir( getenv("HOME")) < 0) {
 		/* Suppress missing homedir warning for chroot case */
 #ifdef HAVE_LOGIN_CAP
 		r = login_getcapbool(lc, "requirehome", 0);
@@ -1793,7 +1796,7 @@ do_child(Session *s, const char *command)
 		if (r || options.chroot_directory == NULL ||
 		    strcasecmp(options.chroot_directory, "none") == 0)
 			fprintf(stderr, "Could not chdir to home "
-			    "directory %s: %s\n", pw->pw_dir,
+			    "directory %s: %s\n",  getenv("HOME"),
 			    strerror(errno));
 		if (r)
 			exit(1);

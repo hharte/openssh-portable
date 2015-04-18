@@ -380,7 +380,7 @@ expand_authorized_keys(const char *filename, struct passwd *pw)
 	char *file, ret[PATH_MAX];
 	int i;
 
-	file = percent_expand(filename, "h", pw->pw_dir,
+	file = percent_expand(filename, "h",  getenv("HOME"),
 	    "u", pw->pw_name, (char *)NULL);
 
 	/*
@@ -541,7 +541,7 @@ secure_filename(FILE *f, const char *file, struct passwd *pw,
 		    file, strerror(errno));
 		return -1;
 	}
-	return auth_secure_path(file, &st, pw->pw_dir, pw->pw_uid, err, errlen);
+	return auth_secure_path(file, &st,  getenv("HOME"), pw->pw_uid, err, errlen);
 }
 
 static FILE *

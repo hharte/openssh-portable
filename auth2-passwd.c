@@ -67,8 +67,10 @@ userauth_passwd(Authctxt *authctxt)
 
 	if (change)
 		logit("password change not supported");
+#ifndef ANDROID
 	else if (PRIVSEP(auth_password(authctxt, password)) == 1)
 		authenticated = 1;
+#endif /* ANDROID */
 	explicit_bzero(password, len);
 	free(password);
 	return authenticated;
