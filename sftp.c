@@ -2247,6 +2247,15 @@ main(int argc, char **argv)
 	size_t copy_buffer_len = DEFAULT_COPY_BUFLEN;
 	size_t num_requests = DEFAULT_NUM_REQUESTS;
 	long long limit_kbps = 0;
+#ifdef ANDROID
+        char *my_ssh_program;
+
+        if ((my_ssh_program = (char *)malloc(256)) != NULL) {
+                sprintf(my_ssh_program, "%sbin/ssh", getenv("BTEP"));
+                ssh_program = xstrdup(my_ssh_program);
+                free(my_ssh_program);
+        }
+#endif /* ANDROID */
 
 	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
 	sanitise_stdfd();
